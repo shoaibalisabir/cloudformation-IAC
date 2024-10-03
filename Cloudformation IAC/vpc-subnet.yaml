@@ -254,21 +254,15 @@ Resources:
         - Key: Name
           Value: MicroservicesInstance
           PropagateAtLaunch: true
-
-
   ScaleOutPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
-      PolicyType: TargetTrackingScaling
-      AutoScalingGroupName: !Ref AutoScalingGroup
-      TargetTrackingConfiguration:
-        TargetValue: 70.0
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-        ScaleOutCooldown: 60
-        ScaleInCooldown: 60
-        DisableScaleIn: false
-
+     PolicyType: TargetTrackingScaling
+     AutoScalingGroupName: !Ref AutoScalingGroup
+     TargetTrackingConfiguration:
+       TargetValue: 70.0
+       PredefinedMetricSpecification:
+         PredefinedMetricType: ASGAverageCPUUtilization
 
   # Auto Scaling Policies
   CPUAlarmHigh:
@@ -287,7 +281,7 @@ Resources:
       Dimensions:
         - Name: AutoScalingGroupName
           Value: !Ref AutoScalingGroup
-          
+
   CPUAlarmLow:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -314,9 +308,6 @@ Resources:
         TargetValue: 30.0
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
-        ScaleOutCooldown: 60
-        ScaleInCooldown: 60
-        DisableScaleIn: false
 
 Outputs:
   VPCId:
