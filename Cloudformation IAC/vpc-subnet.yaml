@@ -258,7 +258,6 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
      PolicyType: TargetTrackingScaling
-     AutoScalingGroupName: !Ref AutoScalingGroup
      TargetTrackingConfiguration:
        TargetValue: 70.0
        PredefinedMetricSpecification:
@@ -303,9 +302,8 @@ Resources:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       PolicyType: TargetTrackingScaling
-      AutoScalingGroupName: !Ref AutoScalingGroup
       TargetTrackingConfiguration:
-        TargetValue: 30.0
+        TargetValue: 70.0
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
 
