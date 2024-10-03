@@ -10,7 +10,7 @@ Resources:
       Tags:
         - Key: Name
           Value: MicroservicesVPC
-    
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
 
@@ -20,7 +20,7 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
-  # Public Subnet 1 (in AZ1)
+  # Public Subnets
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties: 
@@ -32,7 +32,6 @@ Resources:
         - Key: Name
           Value: PublicSubnet1
 
-  # Public Subnet 2 (in AZ2)
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties: 
@@ -44,7 +43,7 @@ Resources:
         - Key: Name
           Value: PublicSubnet2
 
-  # Private Subnet 1 (in AZ1)
+  # Private Subnets
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties: 
@@ -55,7 +54,6 @@ Resources:
         - Key: Name
           Value: PrivateSubnet1
 
-  # Private Subnet 2 (in AZ2)
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties: 
@@ -84,14 +82,13 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
-  # Associate Public Subnet 1 with Public Route Table
+  # Associate Public Subnets with Public Route Table
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties: 
       SubnetId: !Ref PublicSubnet1
       RouteTableId: !Ref PublicRouteTable
 
-  # Associate Public Subnet 2 with Public Route Table
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties: 
@@ -125,14 +122,13 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway
 
-  # Associate Private Subnet 1 with Private Route Table
+  # Associate Private Subnets with Private Route Table
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties: 
       SubnetId: !Ref PrivateSubnet1
       RouteTableId: !Ref PrivateRouteTable
 
-  # Associate Private Subnet 2 with Private Route Table
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties: 
@@ -254,80 +250,59 @@ Resources:
         - Key: Name
           Value: MicroservicesInstance
           PropagateAtLaunch: true
+
+  # Scaling Policies
+  ScaleInPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 30.0
+
   ScaleOutPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
-     PolicyType: TargetTrackingScaling
-     TargetTrackingConfiguration:
-       TargetValue: 70.0
-       PredefinedMetricSpecification:
-         PredefinedMetricType: ASGAverageCPUUtilization
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 60.0
 
-  # Auto Scaling Policies
+  # CloudWatch Alarms
   CPUAlarmHigh:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmDescription: Scale out if CPU > 70% for 5 minutes
-      MetricName: CPUUtilization
+      AlarmDescription: "Alarm if CPU exceeds 80%"
       Namespace: AWS/EC2
-      Statistic: Average
-      Period: 300
-      EvaluationPeriods: 1
-      Threshold: 70
-      ComparisonOperator: GreaterThanThreshold
-      AlarmActions:
-        - !Ref ScaleOutPolicy
+      MetricName: CPUUtilization
       Dimensions:
         - Name: AutoScalingGroupName
           Value: !Ref AutoScalingGroup
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref ScaleOutPolicy
 
   CPUAlarmLow:
     Type: AWS::CloudWatch::Alarm
     Properties:
-      AlarmDescription: Scale in if CPU < 30% for 5 minutes
-      MetricName: CPUUtilization
+      AlarmDescription: "Alarm if CPU drops below 20%"
       Namespace: AWS/EC2
-      Statistic: Average
-      Period: 300
-      EvaluationPeriods: 1
-      Threshold: 30
-      ComparisonOperator: LessThanThreshold
-      AlarmActions:
-        - !Ref ScaleInPolicy
+      MetricName: CPUUtilization
       Dimensions:
         - Name: AutoScalingGroupName
           Value: !Ref AutoScalingGroup
-
-  ScaleInPolicy:
-    Type: AWS::AutoScaling::ScalingPolicy
-    Properties:
-      PolicyType: TargetTrackingScaling
-      TargetTrackingConfiguration:
-        TargetValue: 70.0
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-
-Outputs:
-  VPCId:
-    Description: VPC ID
-    Value: !Ref VPC
-
-  PublicSubnet1Id:
-    Description: Public Subnet 1 ID
-    Value: !Ref PublicSubnet1
-
-  PublicSubnet2Id:
-    Description: Public Subnet 2 ID
-    Value: !Ref PublicSubnet2
-
-  PrivateSubnet1Id:
-    Description: Private Subnet 1 ID
-    Value: !Ref PrivateSubnet1
-
-  PrivateSubnet2Id:
-    Description: Private Subnet 2 ID
-    Value: !Ref PrivateSubnet2
-
-  ALBEndpoint:
-    Description: Application Load Balancer DNS
-    Value: !GetAtt ApplicationLoadBalancer.DNSName
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 20
+      ComparisonOperator: LessThanThreshold
+      AlarmActions:
+        - !Ref ScaleInPolicy
