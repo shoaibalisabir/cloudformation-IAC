@@ -57,4 +57,3 @@ aws cloudformation delete-stack --stack-name MicroservicesStack
 - [AWS CloudFormation Documentation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)
 - [AWS EC2 Documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html)
 
-```
