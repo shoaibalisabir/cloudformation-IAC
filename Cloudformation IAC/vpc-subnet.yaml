@@ -258,25 +258,30 @@ Resources:
           PropagateAtLaunch: true
 
   # Scaling Policies
-  ScaleInPolicy:
-    Type: AWS::AutoScaling::ScalingPolicy
-    Properties:
-      AutoScalingGroupName: !Ref AutoScalingGroup
-      PolicyType: TargetTrackingScaling
-      TargetTrackingConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 30.0
-
+  # Step Scaling Policy for Scaling Out (increase capacity)
   ScaleOutPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
       AutoScalingGroupName: !Ref AutoScalingGroup
-      PolicyType: TargetTrackingScaling
-      TargetTrackingConfiguration:
-        PredefinedMetricSpecification:
-          PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: 60.0
+      PolicyType: StepScaling
+      StepAdjustments:
+        - MetricIntervalLowerBound: 0
+          ScalingAdjustment: 1  # Increase capacity by 1 instance
+      AdjustmentType: ChangeInCapacity
+      Cooldown: 300  # Time (in seconds) between scale out actions
+
+  # Step Scaling Policy for Scaling In (reduce capacity)
+  ScaleInPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: StepScaling
+      StepAdjustments:
+        - MetricIntervalUpperBound: 0
+          ScalingAdjustment: -1  # Decrease capacity by 1 instance
+      AdjustmentType: ChangeInCapacity
+      Cooldown: 300  # Time (in seconds) between scale in actions
+
 
   # CloudWatch Alarms
   CPUAlarmHigh:
