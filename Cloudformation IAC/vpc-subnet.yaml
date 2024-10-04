@@ -234,7 +234,7 @@ Resources:
             cp -r templatemo_520_highway/* /var/www/html/
             systemctl restart httpd
             cd /tmp/
-            rm -rf /tmp/finance
+            rm -rf /tmp/templatemo_520_highway
 
   # Auto Scaling Group
   AutoScalingGroup:
