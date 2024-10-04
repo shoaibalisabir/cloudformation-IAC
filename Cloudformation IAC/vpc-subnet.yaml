@@ -224,11 +224,17 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash
             # Install and start your microservices here
-            yum update -y
-            yum install -y httpd
+            yum install httpd wget unzip vim -y
             systemctl start httpd
-            systemctl enable httpd
-            echo "<h1>Welcome to Microservices Architecture</h1>" > /var/www/html/index.html
+            systemctl enabled httpd
+            mkdir -p /tmp/templatemo_520_highway
+            cd /tmp/templatemo_520_highway
+            wget https://templatemo.com/tm-zip-files-2020/templatemo_520_highway.zip
+            unzip -o templatemo_520_highway.zip
+            cp -r templatemo_520_highway/* /var/www/html/
+            systemctl restart httpd
+            cd /tmp/
+            rm -rf /tmp/finance
 
   # Auto Scaling Group
   AutoScalingGroup:
