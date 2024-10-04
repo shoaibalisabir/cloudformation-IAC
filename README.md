@@ -21,6 +21,15 @@ This CloudFormation template sets up the following resources:
 - **Load Balancing**: Distributes incoming traffic across multiple instances for better performance.
 - **Private Subnets**: Ensures that backend services are not directly accessible from the internet.
 
+## Static HTML Website
+
+In addition to the CloudFormation template for deploying microservices, this project includes a single static HTML website. This static website serves as a simple front-end interface for users to interact with the microservices once they are deployed.
+
+### Features of the Static HTML Website
+
+- **Basic Interface**: Provides a straightforward user interface demonstrating how users might interact with the microservices.
+- **Deployment Example**: While the website does not showcase dynamic functionality, it illustrates how a static front-end can be hosted alongside microservices.
+
 ## Prerequisites
 
 - AWS Account
@@ -42,7 +51,6 @@ To delete the resources created by this stack, run:
 ```bash
 aws cloudformation delete-stack --stack-name MicroservicesStack
 ```
-
 
 ## Acknowledgments
 
